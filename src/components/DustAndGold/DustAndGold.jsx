@@ -175,7 +175,24 @@ function Timeline() {
   );
 }
 
-const NAV_LINKS = ["The Book", "About the Author", "Join the Waitlist"];
+const NAV_LINKS = [
+  { label: "The Book", href: "#book" },
+  { label: "About the Author", href: "#author" },
+  { label: "Join the Waitlist", href: "#waitlist" },
+];
+
+// Fixed nav overlaps the top of whatever we scroll to, so offset by its
+// rendered height rather than a hardcoded number (it differs mobile vs desktop).
+function scrollToSection(e, href, closeMenu) {
+  e.preventDefault();
+  const target = document.querySelector(href);
+  if (!target) return;
+  const navEl = document.querySelector(".dg-nav");
+  const offset = (navEl ? navEl.offsetHeight : 0) + 12;
+  const top = target.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top, behavior: "smooth" });
+  if (closeMenu) closeMenu();
+}
 
 export default function DustAndGold() {
   const [navSolid, setNavSolid] = useState(false);
@@ -207,9 +224,9 @@ export default function DustAndGold() {
         <span className="dg-logo">DUST &amp; GOLD</span>
 
         <div className="dg-nav-links">
-          {NAV_LINKS.map((l) => (
-            <a key={l} href="#">
-              {l}
+          {NAV_LINKS.map(({ label, href }) => (
+            <a key={label} href={href} onClick={(e) => scrollToSection(e, href)}>
+              {label}
             </a>
           ))}
         </div>
@@ -227,9 +244,9 @@ export default function DustAndGold() {
       </nav>
 
       <div className={`dg-mobile-menu ${menuOpen ? "open" : ""}`}>
-        {NAV_LINKS.map((l) => (
-          <a key={l} href="#" onClick={() => setMenuOpen(false)}>
-            {l}
+        {NAV_LINKS.map(({ label, href }) => (
+          <a key={label} href={href} onClick={(e) => scrollToSection(e, href, () => setMenuOpen(false))}>
+            {label}
           </a>
         ))}
       </div>
@@ -254,8 +271,7 @@ export default function DustAndGold() {
               exclusive excerpts and updates from the journey, and get early access to the first
               edition.
             </p>
-            <EmailForm />
-            <p className="dg-microcopy">No spam. Ever. Unsubscribe anytime.</p>
+            <EmailForm /> 
           </div>
         </div>
 
@@ -265,7 +281,7 @@ export default function DustAndGold() {
       </header>
 
       {/* ABOUT THE BOOK */}
-      <section className="dg-section">
+      <section className="dg-section" id="book">
         <div className="dg-inner dg-grid-2">
           <Reveal>
             <div className="dg-tree-box">
@@ -293,7 +309,7 @@ export default function DustAndGold() {
       </section>
 
       {/* ABOUT AUTHOR */}
-      <section className="dg-section dg-panel">
+      <section className="dg-section dg-panel" id="author">
         <div className="dg-inner dg-grid-2">
           <Reveal>
             <div className="dg-portrait">
@@ -355,13 +371,12 @@ export default function DustAndGold() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="dg-cta dg-panel">
+      <section className="dg-cta dg-panel" id="waitlist">
         <Reveal>
           <h2 className="dg-h2">The story is becoming. Don't miss the beginning.</h2>
           <div className="dg-cta-form-wrap">
             <EmailForm dark />
           </div>
-          <p className="dg-microcopy on-dark">No spam. Ever. Unsubscribe anytime.</p>
         </Reveal>
       </section>
 
