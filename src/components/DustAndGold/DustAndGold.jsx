@@ -1,33 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Mail, ArrowRight } from "lucide-react";
+import { Mail, ArrowRight, ArrowLeft } from "lucide-react";
 import "./DustAndGold.css";
+import otitoPhoto from "../../assets/otito.jpg"; // swap in your actual filename/extension
+import frontCoverImg from "../../assets/front-cover-placeholder.svg"; // replace with real front cover
+import backCoverImg from "../../assets/back-cover-placeholder.svg"; // replace with real back cover
 
 // lucide-react dropped brand/social icons in v1, so these three are
 // small inline SVGs instead — same 24x24 grid, same stroke style.
 const iconProps = { width: 13, height: 13, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" };
 
-function TwitterIcon(props) {
+function XIcon(props) {
   return (
-    <svg {...iconProps} {...props}>
-      <path d="M22 4.01c-.9.4-1.8.7-2.8.9 1-.6 1.8-1.6 2.2-2.8-1 .6-2 1-3.1 1.2A4.4 4.4 0 0 0 11.5 7c0 .3 0 .7.1 1A12.5 12.5 0 0 1 2.5 3.3a4.4 4.4 0 0 0 1.4 5.9c-.8 0-1.5-.2-2.1-.6v.1c0 2.1 1.5 3.9 3.5 4.3-.6.2-1.3.2-1.9.1.5 1.7 2.1 3 4 3A8.8 8.8 0 0 1 1 19.5 12.4 12.4 0 0 0 7.9 21.5c8.4 0 13-7 13-13v-.6c.9-.6 1.6-1.4 2.2-2.3Z" />
-    </svg>
-  );
-}
-
-function InstagramIcon(props) {
-  return (
-    <svg {...iconProps} {...props}>
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <path d="M16 11.4a4 4 0 1 1-7.9-1.1 4 4 0 0 1 7.9 1.1Z" />
-      <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" />
-    </svg>
-  );
-}
-
-function FacebookIcon(props) {
-  return (
-    <svg {...iconProps} {...props}>
-      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3.1L18 11h-4V7a1 1 0 0 1 1-1h3Z" />
+    <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M13.6 10.6 20.9 2h-2.2l-6.2 7.2L7.5 2H1l7.6 11L1 22h2.2l6.6-7.6L15.5 22H22l-8.4-11.4Zm-2.3 2.7-.8-1.1L4.1 3.5h2.5l4.9 6.8.8 1.1 6.4 8.9h-2.5l-5.2-7Z" />
     </svg>
   );
 }
@@ -127,27 +112,112 @@ function BookCover() {
   );
 }
 
-function TreeIllustration() {
+function FrontCoverCard() {
   return (
-    <svg viewBox="0 0 400 260" className="w-full h-full" style={{ width: "100%", height: "100%" }}>
-      <defs>
-        <radialGradient id="skyGrad" cx="30%" cy="35%" r="80%">
-          <stop offset="0%" stopColor="#e8d3a3" />
-          <stop offset="55%" stopColor="#b89968" />
-          <stop offset="100%" stopColor="#6b5638" />
-        </radialGradient>
-      </defs>
-      <rect width="400" height="260" fill="url(#skyGrad)" />
-      <ellipse cx="200" cy="235" rx="180" ry="18" fill="#4a3a24" opacity="0.35" />
-      <g opacity="0.92">
-        <path
-          d="M200 230 C196 190 198 160 195 140 C170 130 150 100 155 80 C160 95 175 108 193 118 C188 90 178 60 190 30 C195 60 200 90 205 118 C222 108 238 92 244 74 C248 96 228 128 202 138 C200 160 202 190 204 230 Z"
-          fill="#1c140c"
-        />
-        <path d="M195 140 C175 148 150 148 130 132 C140 152 165 162 193 156 Z" fill="#1c140c" />
-        <path d="M204 138 C226 148 252 144 268 126 C260 148 234 162 205 156 Z" fill="#1c140c" />
-      </g>
-    </svg>
+    <div className="dg-cover-card">
+      <img src={frontCoverImg} alt="Front cover of On Becoming: Dust & Gold" className="dg-cover-img" />
+    </div>
+  );
+}
+
+function BackCoverCard() {
+  return (
+    <div className="dg-cover-card">
+      <img src={backCoverImg} alt="Back cover of On Becoming: Dust & Gold" className="dg-cover-img" />
+    </div>
+  );
+}
+
+function CoverCarousel() {
+  const slides = [FrontCoverCard, BackCoverCard];
+  const [index, setIndex] = useState(0);
+  const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const trackRef = useRef(null);
+  const startX = useRef(0);
+  const widthRef = useRef(0);
+
+  useEffect(() => {
+    if (dragging) return;
+    const t = setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(t);
+  }, [dragging, slides.length]);
+
+  const onDown = (clientX) => {
+    startX.current = clientX;
+    widthRef.current = trackRef.current ? trackRef.current.offsetWidth : 1;
+    setDragging(true);
+  };
+  const onMove = (clientX) => {
+    if (!dragging) return;
+    setDragX(clientX - startX.current);
+  };
+  const onUp = () => {
+    if (!dragging) return;
+    const threshold = widthRef.current * 0.18;
+    if (dragX < -threshold && index < slides.length - 1) setIndex(index + 1);
+    else if (dragX > threshold && index > 0) setIndex(index - 1);
+    setDragging(false);
+    setDragX(0);
+  };
+
+  const offsetPercent = -index * 100;
+  const dragPercent = widthRef.current ? (dragX / widthRef.current) * 100 : 0;
+
+  return (
+    <div className="dg-carousel">
+      <div
+        className="dg-carousel-track"
+        ref={trackRef}
+        style={{
+          transform: `translateX(${offsetPercent + dragPercent}%)`,
+          transition: dragging ? "none" : "transform 0.5s cubic-bezier(0.65, 0, 0.35, 1)",
+        }}
+        onPointerDown={(e) => onDown(e.clientX)}
+        onPointerMove={(e) => onMove(e.clientX)}
+        onPointerUp={onUp}
+        onPointerLeave={onUp}
+        onTouchStart={(e) => onDown(e.touches[0].clientX)}
+        onTouchMove={(e) => onMove(e.touches[0].clientX)}
+        onTouchEnd={onUp}
+      >
+        {slides.map((Slide, i) => (
+          <div className="dg-carousel-slide" key={i}>
+            <Slide />
+          </div>
+        ))}
+      </div>
+
+      <button
+        className="dg-carousel-arrow prev"
+        onClick={() => setIndex((i) => Math.max(0, i - 1))}
+        aria-label="Previous cover"
+        disabled={index === 0}
+      >
+        <ArrowLeft size={16} />
+      </button>
+      <button
+        className="dg-carousel-arrow next"
+        onClick={() => setIndex((i) => Math.min(slides.length - 1, i + 1))}
+        aria-label="Next cover"
+        disabled={index === slides.length - 1}
+      >
+        <ArrowRight size={16} />
+      </button>
+
+      <div className="dg-carousel-dots">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            className={`dg-carousel-dot ${i === index ? "active" : ""}`}
+            onClick={() => setIndex(i)}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -271,7 +341,8 @@ export default function DustAndGold() {
               exclusive excerpts and updates from the journey, and get early access to the first
               edition.
             </p>
-            <EmailForm /> 
+            <EmailForm />
+            <p className="dg-microcopy">No spam. Ever. Unsubscribe anytime.</p>
           </div>
         </div>
 
@@ -285,7 +356,7 @@ export default function DustAndGold() {
         <div className="dg-inner dg-grid-2">
           <Reveal>
             <div className="dg-tree-box">
-              <TreeIllustration />
+              <CoverCarousel />
             </div>
           </Reveal>
           <Reveal delay={0.1}>
@@ -313,7 +384,7 @@ export default function DustAndGold() {
         <div className="dg-inner dg-grid-2">
           <Reveal>
             <div className="dg-portrait">
-              <div className="dg-portrait-fade" />
+              <img src={otitoPhoto} alt="Otito Nosike" className="dg-portrait-img" />
             </div>
           </Reveal>
           <Reveal delay={0.1}>
@@ -377,6 +448,7 @@ export default function DustAndGold() {
           <div className="dg-cta-form-wrap">
             <EmailForm dark />
           </div>
+          <p className="dg-microcopy on-dark">No spam. Ever. Unsubscribe anytime.</p>
         </Reveal>
       </section>
 
@@ -388,11 +460,9 @@ export default function DustAndGold() {
         </div>
         <div className="dg-social">
           <span>Follow Otito</span>
-          {[TwitterIcon, InstagramIcon, FacebookIcon].map((Icon, i) => (
-            <a key={i} href="#" aria-label="Social link">
-              <Icon color="#b8923d" />
-            </a>
-          ))}
+          <a href="https://x.com/otitonosike" aria-label="X (Twitter)">
+            <XIcon color="#b8923d" />
+          </a>
         </div>
       </footer>
     </div>
