@@ -1,21 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Mail, ArrowRight, ArrowLeft } from "lucide-react";
+import { Mail, ArrowRight } from "lucide-react";
 import "./DustAndGold.css";
 import otitoPhoto from "../../assets/otito.jpg"; // swap in your actual filename/extension
-import frontCoverImg from "../../assets/front-cover-placeholder.svg"; // replace with real front cover
-import backCoverImg from "../../assets/back-cover-placeholder.svg"; // replace with real back cover
-
-// lucide-react dropped brand/social icons in v1, so these three are
-// small inline SVGs instead — same 24x24 grid, same stroke style.
-const iconProps = { width: 13, height: 13, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" };
-
-function XIcon(props) {
-  return (
-    <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path d="M13.6 10.6 20.9 2h-2.2l-6.2 7.2L7.5 2H1l7.6 11L1 22h2.2l6.6-7.6L15.5 22H22l-8.4-11.4Zm-2.3 2.7-.8-1.1L4.1 3.5h2.5l4.9 6.8.8 1.1 6.4 8.9h-2.5l-5.2-7Z" />
-    </svg>
-  );
-}
 
 function useReveal() {
   const ref = useRef(null);
@@ -80,60 +66,53 @@ function EmailForm({ dark = false }) {
   );
 }
 
-function BookCover() {
+function BookFaceFront() {
   return (
-    <div className="dg-book-wrap">
-      <div className="dg-book">
-        <div className="dg-book-bg" />
-        <div className="dg-book-face">
-          <div>
-            <p className="dg-book-kicker">ON BECOMING</p>
-            <h3 className="dg-book-title">
-              Dust <span>&amp;</span>
-              <br />
-              <span>Gold</span>
-            </h3>
-          </div>
-          <div className="dg-book-dot">
-            <i />
-          </div>
-          <div>
-            <p className="dg-book-sub">
-              A MEMOIR OF LOVE, LOSS,
-              <br />
-              HOPE AND THE HUMAN JOURNEY
-            </p>
-            <p className="dg-book-author">Otito Nosike</p>
-          </div>
-        </div>
-        <div className="dg-book-edge" />
+    <div className="dg-book-face">
+      <div>
+        <p className="dg-book-kicker">ON BECOMING</p>
+        <h3 className="dg-book-title">
+          Dust <span>&amp;</span>
+          <br />
+          <span>Gold</span>
+        </h3>
+      </div>
+      <div className="dg-book-dot">
+        <i />
+      </div>
+      <div>
+        <p className="dg-book-sub">
+          A MEMOIR OF LOVE, LOSS,
+          <br />
+          HOPE AND THE HUMAN JOURNEY
+        </p>
+        <p className="dg-book-author">Otito Nosike</p>
       </div>
     </div>
   );
 }
 
-function FrontCoverCard() {
+function BookFaceBack() {
   return (
-    <div className="dg-cover-card">
-      <img src={frontCoverImg} alt="Front cover of On Becoming: Dust & Gold" className="dg-cover-img" />
+    <div className="dg-book-face">
+      <p className="dg-book-kicker">PRAISE FOR THE BOOK</p>
+      <p className="dg-book-back-quote">
+        &ldquo;A rare, unflinching meditation on what it costs to become yourself.&rdquo;
+      </p>
+      <div className="dg-book-dot">
+        <i />
+      </div>
+      <p className="dg-book-sub">ON BECOMING: DUST &amp; GOLD</p>
     </div>
   );
 }
 
-function BackCoverCard() {
-  return (
-    <div className="dg-cover-card">
-      <img src={backCoverImg} alt="Back cover of On Becoming: Dust & Gold" className="dg-cover-img" />
-    </div>
-  );
-}
-
-function CoverCarousel() {
-  const slides = [FrontCoverCard, BackCoverCard];
+function BookCover() {
+  const slides = [BookFaceFront, BookFaceBack];
   const [index, setIndex] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
-  const trackRef = useRef(null);
+  const stageRef = useRef(null);
   const startX = useRef(0);
   const widthRef = useRef(0);
 
@@ -147,7 +126,7 @@ function CoverCarousel() {
 
   const onDown = (clientX) => {
     startX.current = clientX;
-    widthRef.current = trackRef.current ? trackRef.current.offsetWidth : 1;
+    widthRef.current = stageRef.current ? stageRef.current.offsetWidth : 1;
     setDragging(true);
   };
   const onMove = (clientX) => {
@@ -163,59 +142,44 @@ function CoverCarousel() {
     setDragX(0);
   };
 
-  const offsetPercent = -index * 100;
-  const dragPercent = widthRef.current ? (dragX / widthRef.current) * 100 : 0;
+  // Live rotateY while dragging: a full-width drag previews a half flip,
+  // then snaps to a clean 0deg/180deg face on release.
+  const dragDeg = widthRef.current ? -(dragX / widthRef.current) * 180 : 0;
+  const rotation = index * 180 + dragDeg;
 
   return (
-    <div className="dg-carousel">
-      <div
-        className="dg-carousel-track"
-        ref={trackRef}
-        style={{
-          transform: `translateX(${offsetPercent + dragPercent}%)`,
-          transition: dragging ? "none" : "transform 0.5s cubic-bezier(0.65, 0, 0.35, 1)",
-        }}
-        onPointerDown={(e) => onDown(e.clientX)}
-        onPointerMove={(e) => onMove(e.clientX)}
-        onPointerUp={onUp}
-        onPointerLeave={onUp}
-        onTouchStart={(e) => onDown(e.touches[0].clientX)}
-        onTouchMove={(e) => onMove(e.touches[0].clientX)}
-        onTouchEnd={onUp}
-      >
-        {slides.map((Slide, i) => (
-          <div className="dg-carousel-slide" key={i}>
-            <Slide />
+    <div className="dg-book-wrap">
+      <div className="dg-book" ref={stageRef}>
+        <div
+          className="dg-book-flip"
+          style={{
+            transform: `rotateY(${rotation}deg)`,
+            transition: dragging ? "none" : "transform 0.6s cubic-bezier(0.65, 0, 0.35, 1)",
+          }}
+          onPointerDown={(e) => onDown(e.clientX)}
+          onPointerMove={(e) => onMove(e.clientX)}
+          onPointerUp={onUp}
+          onPointerLeave={onUp}
+          onTouchStart={(e) => onDown(e.touches[0].clientX)}
+          onTouchMove={(e) => onMove(e.touches[0].clientX)}
+          onTouchEnd={onUp}
+        >
+          <div className="dg-book-face-pos front">
+            <div className="dg-book-bg" />
+            <BookFaceFront />
+            <div className="dg-book-edge" />
           </div>
-        ))}
-      </div>
-
-      <button
-        className="dg-carousel-arrow prev"
-        onClick={() => setIndex((i) => Math.max(0, i - 1))}
-        aria-label="Previous cover"
-        disabled={index === 0}
-      >
-        <ArrowLeft size={16} />
-      </button>
-      <button
-        className="dg-carousel-arrow next"
-        onClick={() => setIndex((i) => Math.min(slides.length - 1, i + 1))}
-        aria-label="Next cover"
-        disabled={index === slides.length - 1}
-      >
-        <ArrowRight size={16} />
-      </button>
-
-      <div className="dg-carousel-dots">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            className={`dg-carousel-dot ${i === index ? "active" : ""}`}
-            onClick={() => setIndex(i)}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
+          <div className="dg-book-face-pos back">
+            <div className="dg-book-bg" />
+            <BookFaceBack />
+            <div className="dg-book-edge" />
+          </div>
+        </div>
+        <div className="dg-book-indicators">
+          {slides.map((_, i) => (
+            <span key={i} className={`dg-book-indicator ${i === index ? "active" : ""}`} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -353,13 +317,8 @@ export default function DustAndGold() {
 
       {/* ABOUT THE BOOK */}
       <section className="dg-section" id="book">
-        <div className="dg-inner dg-grid-2">
+        <div className="dg-inner dg-single">
           <Reveal>
-            <div className="dg-tree-box">
-              <CoverCarousel />
-            </div>
-          </Reveal>
-          <Reveal delay={0.1}>
             <p className="dg-eyebrow">About the book</p>
             <h2 className="dg-h2">On Becoming: Dust &amp; Gold</h2>
             <p className="dg-body">
@@ -367,12 +326,14 @@ export default function DustAndGold() {
               wounds us before we understand ourselves.
             </p>
             <p className="dg-body">
-              Moving through childhood, family, love, grief, faith, betrayal, hope, and mortality,
-              the book turns personal experience into larger questions about why we hurt, what we
-              heal, what we inherit, and who we might become.
+              Moving between autobiography, philosophy, psychology, history, theology, literature,
+              and cultural criticism, Otito Nosike explores the invisible forces that shape
+              identity: love and abandonment, hope and disappointment, suffering and resilience,
+              family, memory, faith, shame, power, and the stories we inherit long before we learn
+              to question them.
             </p>
             <p className="dg-quote-line">It is a journey through dust and toward gold.</p>
-            <a href="#" className="dg-link">
+            <a href="/synopsis.html" className="dg-link">
               Read the full synopsis <ArrowRight size={13} />
             </a>
           </Reveal>
@@ -454,16 +415,7 @@ export default function DustAndGold() {
 
       {/* FOOTER */}
       <footer className="dg-footer dg-panel">
-        <div className="dg-footer-brand">
-          <p>Dust &amp; Gold</p>
-          <p>© 2026 Otito Nosike. All rights reserved.</p>
-        </div>
-        <div className="dg-social">
-          <span>Follow Otito</span>
-          <a href="https://x.com/otitonosike" aria-label="X (Twitter)">
-            <XIcon color="#b8923d" />
-          </a>
-        </div>
+        <p>© 2026 Otito Nosike. All rights reserved.</p>
       </footer>
     </div>
   );

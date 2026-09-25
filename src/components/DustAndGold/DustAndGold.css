@@ -296,18 +296,44 @@
   width: min(70vw, 280px);
   aspect-ratio: 0.7;
   margin: 0 auto;
+  perspective: 1200px;
   transform: rotateY(-14deg) rotateX(1deg);
   transform-style: preserve-3d;
 }
+.dg-book-flip {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+.dg-book-flip:active { cursor: grabbing; }
+.dg-book-face-pos {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.dg-book-face-pos.front { transform: rotateY(0deg); }
+.dg-book-face-pos.back { transform: rotateY(180deg); }
 .dg-book-bg {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, #241b10 0%, #100c07 60%, #000 100%);
   box-shadow: 0 30px 60px -14px rgba(28, 23, 18, 0.35), 0 8px 24px rgba(28, 23, 18, 0.18);
 }
-.dg-book-face {
+.dg-book-edge {
   position: absolute;
-  inset: 0;
+  top: 4px; bottom: 4px; right: -6px;
+  width: 6px;
+  background: linear-gradient(to right, #d8cba8, #f6f1e7);
+}
+.dg-book-face {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -315,6 +341,15 @@
   padding: clamp(20px, 6vw, 30px) clamp(14px, 4vw, 22px);
   border: 1px solid rgba(184, 146, 61, 0.3);
   text-align: center;
+  pointer-events: none;
+}
+.dg-book-back-quote {
+  font-family: var(--script);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--panel-dark-text);
+  font-size: clamp(0.75rem, 3vw, 0.95rem);
+  line-height: 1.55;
 }
 .dg-book-kicker {
   color: var(--gold);
@@ -365,12 +400,23 @@
   font-size: 0.95rem;
   margin-top: 10px;
 }
-.dg-book-edge {
+.dg-book-indicators {
   position: absolute;
-  top: 4px; bottom: 4px; right: -6px;
-  width: 6px;
-  background: linear-gradient(to right, #d8cba8, #f6f1e7);
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
 }
+.dg-book-indicator {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+}
+.dg-book-indicator.active { background: var(--gold); border-color: var(--gold); }
 
 /* ---------- Reveal ---------- */
 .dg-reveal {
@@ -380,100 +426,7 @@
 }
 .dg-reveal.in { opacity: 1; transform: translateY(0); }
 
-/* ---------- About book art ---------- */
-.dg-tree-box {
-  display: flex;
-  justify-content: center;
-}
-
-/* ---------- Cover carousel ---------- */
-.dg-carousel {
-  position: relative;
-  width: clamp(190px, 34vw, 270px);
-  aspect-ratio: 0.7;
-  border-radius: 10px;
-  overflow: hidden;
-  background: linear-gradient(160deg, #241b10, #0c0906);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-    0 0 32px rgba(255, 255, 255, 0.06),
-    0 28px 50px -18px rgba(0, 0, 0, 0.55);
-  touch-action: pan-y;
-}
-.dg-carousel-track {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  cursor: grab;
-  user-select: none;
-}
-.dg-carousel-track:active { cursor: grabbing; }
-.dg-carousel-slide {
-  flex: 0 0 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dg-cover-card {
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(184, 146, 61, 0.35);
-  outline: 1px solid rgba(255, 255, 255, 0.08);
-  outline-offset: -3px;
-  background: linear-gradient(135deg, #241b10 0%, #100c07 60%, #000 100%);
-  pointer-events: none;
-}
-.dg-cover-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.dg-carousel-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(23, 19, 15, 0.55);
-  color: var(--panel-dark-text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: border-color 0.2s ease, opacity 0.2s ease;
-}
-.dg-carousel-arrow:hover { border-color: var(--gold); }
-.dg-carousel-arrow:disabled { opacity: 0.25; cursor: default; }
-.dg-carousel-arrow.prev { left: 10px; }
-.dg-carousel-arrow.next { right: 10px; }
-
-.dg-carousel-dots {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-}
-.dg-carousel-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.15);
-  padding: 0;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-.dg-carousel-dot.active { background: var(--gold); border-color: var(--gold); }
+.dg-single { max-width: 42rem; }
 .dg-h2 {
   font-family: var(--serif);
   font-weight: 700;
@@ -617,52 +570,17 @@
 
 /* ---------- Footer ---------- */
 .dg-footer {
-  padding: 36px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  padding: 32px 20px;
   text-align: center;
   border-top: 1px solid rgba(184, 146, 61, 0.15);
 }
-.dg-footer-brand p:first-child {
-  font-family: var(--serif);
-  font-weight: 600;
-  color: var(--gold-light);
-  font-size: 0.9rem;
+.dg-footer p {
+  font-family: var(--sans);
+  font-weight: 300;
+  color: var(--panel-dark-text-faint);
+  font-size: 0.7rem;
   margin: 0;
 }
-.dg-footer-brand p:last-child {
-  font-family: var(--sans);
-  font-weight: 300;
-  color: var(--panel-dark-text-faint);
-  font-size: 0.68rem;
-  margin: 4px 0 0;
-}
-.dg-social {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.dg-social span {
-  font-family: var(--sans);
-  font-weight: 300;
-  color: var(--panel-dark-text-faint);
-  font-size: 0.68rem;
-  margin-right: 4px;
-}
-.dg-social a {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid rgba(184, 146, 61, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.2s ease;
-}
-.dg-social a:hover { border-color: var(--gold); }
-
 /* ---------- Small-phone refinement (below the first real breakpoint) ---------- */
 @media (max-width: 379px) {
   .dg-logo { font-size: 0.75rem; }
@@ -683,8 +601,6 @@
   .dg-nav { padding: 18px 32px; }
   .dg-nav-links { display: flex; }
   .dg-burger, .dg-mobile-menu { display: none; }
-
-  .dg-footer { flex-direction: row; justify-content: space-between; text-align: left; }
 }
 
 @media (min-width: 1024px) {
