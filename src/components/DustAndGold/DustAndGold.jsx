@@ -301,7 +301,8 @@ export default function DustAndGold() {
           <div className="dg-form-card">
             <p className="label">Join the first readers</p>
             <p className="desc">
-              Be among the first to know when On Becoming: Dust &amp; Gold is available, receive
+              Be among the first to know when <strong>On Becoming: Dust &amp; Gold</strong> is
+              available, receive
               exclusive excerpts and updates from the journey, and get early access to the first
               edition.
             </p>
@@ -354,13 +355,18 @@ export default function DustAndGold() {
               A writer who explores philosophy, religion, and the human condition
             </h2>
             <p className="dg-body">
-              Otito Nosike is a Nigerian writer whose work explores philosophy, religion,
-              psychology, history, and the human condition. He is the founder of Zeiya, a writing
-              agency dedicated to helping people write with more depth and authenticity, and the
-              creator of The Writing Forge, an online writing mentorship programme.
+              Otito Nosike grew up in Lagos, Nigeria, where a lifelong fascination with literature
+              first took root.
             </p>
-            <p className="dg-body">On Becoming: Dust &amp; Gold is his first book.</p>
-            <a href="#" className="dg-link">
+            <p className="dg-body">
+              He is the founder of <strong>Zeya</strong>, a writing startup committed to helping
+              people write with greater depth and authenticity, and the creator of{" "}
+              <strong>The Writing Forge</strong>, an online writing mentorship programme.
+            </p>
+            <p className="dg-body">
+              <strong>On Becoming: Dust &amp; Gold</strong> is his first book.
+            </p>
+            <a href="/author.html" className="dg-link">
               Read more about the author <ArrowRight size={13} />
             </a>
           </Reveal>
